@@ -1,28 +1,31 @@
 #!/usr/bin/env python3
-"""Generate pixel-perfect FigCraft batch script matching the reference image."""
+"""Build the complete 3-screen Kids Drawing App with 100% reference fidelity."""
 import json
 
 # ---------------------------------------------------------------- palette
 CREAM       = "#FDF8EE"
-CANVAS_DOT  = "#F2E8D5"
+CANVAS_DOT  = "#EFE5D0"
 HERO        = "#FFC83B"
-HERO_DEEP   = "#F5B82E"
+HERO_DEEP   = "#F5A623"
 HERO_SOFT   = "#FFD966"
 ORANGE      = "#F59324"
 ORANGE_HOT  = "#FF7A3D"
 WHITE       = "#FFFFFF"
-CANVAS      = "#FDFBF7"
-INK         = "#2D2A26"
+CANVAS      = "#FBF8F2"
+INK         = "#18181B"
 INK_SOFT    = "#9E988F"
 BORDER      = "#F0E8D8"
 CHIP        = "#F4F1EA"
 TRACK       = "#EFEAE0"
 GREEN       = "#34C759"
 GREEN_NAV   = "#32B753"
-RED         = "#F6453D"
+GREEN_BTN   = "#00B862"
+GREEN_GLOW  = "#00B86255"
+RED         = "#FF4B4B"
 RED_SOFT    = "#E2574C"
-BLUE        = "#1E88E5"
+BLUE_WHALE  = "#1976D2"
 BLUE_DARK   = "#0D47A1"
+BLUE_FIN2   = "#1A4452"
 BLUE_DEEP   = "#063D78"
 BLUE_LT     = "#38BDF8"
 PINK        = "#FF7B98"
@@ -33,12 +36,14 @@ LILAC       = "#C4B5FD"
 PURPLE      = "#A855F7"
 GOLD        = "#FBBF24"
 GOLD_DARK   = "#D97706"
+GOLD_STRIPE = "#F5A623"
+LIME_SPOT   = "#84CC16"
 BLACK       = "#18181B"
 WOOD        = "#E8D5B5"
 GILL_GREEN  = "#4ADE80"
+BELLY_CREAM = "#FFFDF5"
 
 ROUND = "SF Pro Rounded"
-CHALK = "Chalkboard SE"
 
 SHADOW_CARD = [{"type": "dropShadow", "color": "#B8965826", "offset": [0, 8], "radius": 20}]
 SHADOW_SOFT = [{"type": "dropShadow", "color": "#B896581F", "offset": [0, 4], "radius": 12}]
@@ -176,7 +181,6 @@ def row(name, parent, x, y, w, h=None, gap=10, pad=0, main="spaceBetween",
 # ---------------------------------------------------------------- glyph paths
 P_BELL   = "M12 2a6 6 0 0 0-6 6v4.2L3.8 15.6h16.4L18 12.2V8a6 6 0 0 0-6-6zm0 19.5a3.1 3.1 0 0 0 3-2.4H9a3.1 3.1 0 0 0 3 2.4z"
 P_BACK   = "M15.2 3.4L6.1 12l9.1 8.6 2.3-2.4L10.8 12l6.7-6.2z"
-P_TRASH  = "M9.2 2.6h5.6l.9 1.9h4.1v2.2H4.2V4.5h4.1zM6 8.6h12l-1 12.8H7z"
 P_CHECK  = "M3.6 11.8l2.4-2.4 3.2 3.2 8.8-8.8 2.4 2.4-11.2 11.2z"
 P_PLUS   = "M10.8 3.6h2.4v7.2h7.2v2.4h-7.2v7.2h-2.4v-7.2H3.6v-2.4h7.2z"
 P_HOUSE  = "M12 2.6l9.4 8.4h-3.1v10.4h-4.6v-6.4h-3.4v6.4H5.7V11H2.6z"
@@ -191,53 +195,38 @@ P_CLIP   = "M14.6 3.4a3.4 3.4 0 0 1 4.8 4.8l-9 9a5.6 5.6 0 0 1-7.9-7.9l8-8 1.8 1
 P_RAINBOW_1 = "M0 30A30 30 0 0 1 60 30h-9A21 21 0 0 0 9 30z"
 P_RAINBOW_2 = "M11 30A19 19 0 0 1 49 30h-9A10 10 0 0 0 20 30z"
 P_CORAL     = "M10 40c0-8-6-10-6-16 0-4 3-6 6-6s6 2 6 6c0 6-6 8-6 16z"
-P_BRISTLE   = "M0 0h18l-2 13c-5 5-9 5-14 0z"
-P_TRI       = "M0 0h14l-7 16z"
+P_SOLID_ARROW = "M 18 8 L 18 14 L 10 14 L 14 18 L 10 21 L 2 11 L 10 1 L 14 4 L 10 8 Z"
 
 # ---------------------------------------------------------------- complex assets
 def trophy(parent, x, y, scale=1.0, name="Trophy"):
     g = box(name, parent, x, y, 24 * scale, 24 * scale, "none", ref=f"{name}-{int(x)}-{int(y)}")
     s = scale
-    # blue ribbon
     vec("RibbonL", g, "M0 0 L5 12 L10 0 Z", 3 * s, 11 * s, 7 * s, 12 * s, "#1E88E5", rotation=-14)
     vec("RibbonR", g, "M0 0 L5 12 L10 0 Z", 14 * s, 11 * s, 7 * s, 12 * s, "#1E88E5", rotation=14)
-    # cup base
     rect("Base", g, 7 * s, 18 * s, 10 * s, 4 * s, GOLD_DARK, radius=1)
     rect("Stem", g, 10.5 * s, 13 * s, 3 * s, 6 * s, GOLD)
-    # cup body
     vec("Cup", g, "M0 0 C0 8, 4 12, 10 12 C16 12, 20 8, 20 0 Z", 2 * s, 3 * s, 20 * s, 12 * s, GOLD)
-    # handles
     ring("HandleL", g, 0 * s, 4 * s, 6 * s, GOLD, weight=1.6 * s)
     ring("HandleR", g, 18 * s, 4 * s, 6 * s, GOLD, weight=1.6 * s)
     return g
 
 def pencil_giant(parent, x, y, length=200, rotation=22, name="GiantPencil"):
     g = box(name, parent, x, y, length, 36, "none", rotation=rotation, ref=f"{name}-{int(x)}")
-    # eraser
     rect("Eraser", g, 0, 4, 22, 28, "#FF8DA1", radius=[6, 0, 0, 6])
-    # ferrule
     rect("Ferrule", g, 22, 4, 12, 28, "#B0BEC5")
-    # body stripes
     rect("ShaftTop", g, 34, 4, length - 74, 9, "#FDD835")
     rect("ShaftMid", g, 34, 13, length - 74, 10, "#FBC02D")
     rect("ShaftBot", g, 34, 23, length - 74, 9, "#F57F17")
-    # wooden tip
     vec("Wood", g, "M0 0 L26 14 L0 28 Z", length - 40, 4, 26, 28, WOOD)
-    # lead
     vec("Lead", g, "M0 0 L10 5 L0 10 Z", length - 14, 13, 10, 10, BLACK)
     return g
 
 def axolotl_cute(parent, x, y, scale=1.0, pose="sitting", with_pencil=False, name="Mascot"):
-    """
-    Accurate cute axolotl character with hot-pink shirt, lavender shorts,
-    smiling open mouth with tooth/tongue, and lime green-tipped gills.
-    """
     w_box = 150 * scale
     h_box = 145 * scale
     g = box(name, parent, x, y, w_box, h_box, "none", ref=f"{name}-{int(x)}-{int(y)}")
     s = scale
 
-    # Gills (3 pairs with lime green tips)
     for i, (gx, gy, rot) in enumerate(((6, 22, -22), (0, 40, -6), (8, 58, 16))):
         oval(f"GillL_Base_{i}", g, gx * s, gy * s, 26 * s, 14 * s, PINK, rotation=rot)
         oval(f"GillL_Tip_{i}", g, (gx - 2) * s, (gy + 2) * s, 12 * s, 10 * s, GILL_GREEN, rotation=rot)
@@ -245,153 +234,119 @@ def axolotl_cute(parent, x, y, scale=1.0, pose="sitting", with_pencil=False, nam
         oval(f"GillR_Base_{i}", g, gx * s, gy * s, 26 * s, 14 * s, PINK, rotation=rot)
         oval(f"GillR_Tip_{i}", g, (gx + 16) * s, (gy + 2) * s, 12 * s, 10 * s, GILL_GREEN, rotation=rot)
 
-    # Body & Clothes
-    # Chubby Pink Legs & Feet
     oval("FootL", g, 38 * s, 114 * s, 24 * s, 16 * s, PINK_LT)
     oval("FootR", g, 84 * s, 114 * s, 24 * s, 16 * s, PINK_LT)
     
-    # Lavender Shorts
     rect("ShortsL", g, 40 * s, 100 * s, 32 * s, 20 * s, LILAC, radius=[4, 4, 10, 10])
     rect("ShortsR", g, 74 * s, 100 * s, 32 * s, 20 * s, LILAC, radius=[4, 4, 10, 10])
-    
-    # Hot Pink Shirt / Torso
     rect("Shirt", g, 38 * s, 70 * s, 70 * s, 38 * s, PINK_SHIRT, radius=[18, 18, 8, 8])
 
-    # Arms
     if pose == "waving_left":
-        # Left arm stretched wide waving towards Screen 1 Home
         vec("ArmL", g, "M 28 20 C 14 18, 0 8, 2 0 C 4 -6, 18 2, 34 10 Z", 6 * s, 70 * s, 36 * s, 26 * s, PINK_LT, rotation=15)
         oval("HandL", g, 2 * s, 68 * s, 18 * s, 18 * s, PINK_LT)
-        # Right arm resting down
         oval("ArmR", g, 104 * s, 78 * s, 20 * s, 24 * s, PINK_LT, rotation=-15)
     elif with_pencil:
-        # Hands resting on pencil
         oval("HandL", g, 34 * s, 86 * s, 18 * s, 16 * s, PINK_LT)
         oval("HandR", g, 94 * s, 86 * s, 18 * s, 16 * s, PINK_LT)
     else:
-        # Normal cute arms
         oval("ArmL", g, 26 * s, 74 * s, 18 * s, 22 * s, PINK_LT, rotation=20)
         oval("ArmR", g, 102 * s, 74 * s, 18 * s, 22 * s, PINK_LT, rotation=-20)
 
-    # Head
     oval("Head", g, 30 * s, 14 * s, 86 * s, 68 * s, PINK_LT)
-    
-    # Blushing Cheeks
     oval("CheekL", g, 36 * s, 52 * s, 18 * s, 12 * s, PINK, opacity=0.85)
     oval("CheekR", g, 92 * s, 52 * s, 18 * s, 12 * s, PINK, opacity=0.85)
     
-    # Eyes
     oval("EyeL", g, 50 * s, 34 * s, 11 * s, 13 * s, BLACK)
     oval("EyeR", g, 84 * s, 34 * s, 11 * s, 13 * s, BLACK)
     oval("GlintL", g, 53 * s, 36 * s, 4.5 * s, 4.5 * s, WHITE)
     oval("GlintR", g, 87 * s, 36 * s, 4.5 * s, 4.5 * s, WHITE)
 
-    # Joyful Open Mouth with Tooth & Tongue
     m = box("MouthFrame", g, 58 * s, 48 * s, 30 * s, 22 * s, "#881337", radius=[4, 4, 15, 15], clip=True, ref=f"mouth-{int(x)}-{int(y)}")
     rect("Tooth", m, 11 * s, 0, 8 * s, 5 * s, WHITE, radius=2)
     oval("Tongue", m, 5 * s, 11 * s, 20 * s, 14 * s, "#FF7B98")
 
     return g
 
-def whale_drawing_accurate(parent, x, y, scale=1.0, name="Drawing/Whale"):
-    """
-    Pixel-accurate cartoon whale matching the reference image.
-    Features:
-    - Bulbous dome head facing right
-    - Cream underbelly with 3 dark blue groove lines
-    - Black smiling mouth with dimple tick at top-left
-    - Glossy black eye with white glint
-    - Cute curved tail flukes
-    - Pectoral fin pointing down
-    - 3 golden blowhole droplets
-    - Purple, cyan, and coral doodle rings
-    """
-    g = box(name, parent, x, y, 220 * scale, 150 * scale, "none", ref=f"{name}-{int(x)}")
+def build_whale_drawing(parent, x, y, scale=1.0, name="WhaleArt"):
+    """Accurate Cartoon Blue Whale from reference."""
     s = scale
+    g = box(name, parent, x, y, 270 * s, 240 * s, "none", ref=f"{name}-{int(x)}")
 
-    # Surrounding Doodle Rings (behind whale)
-    ring("RingPurple", g, 172 * s, 10 * s, 24 * s, PURPLE, weight=3.5 * s)
-    ring("RingCyan", g, 204 * s, 32 * s, 16 * s, BLUE_LT, weight=3 * s)
-    ring("RingCoral", g, 26 * s, 104 * s, 26 * s, ORANGE_HOT, weight=4 * s)
+    # Doodle rings
+    ring("Doodle/Purple", g, 150 * s, 10 * s, 24 * s, "#C084FC", weight=3.8 * s)
+    ring("Doodle/Cyan", g, 212 * s, 38 * s, 14 * s, "#06B6D4", weight=3.0 * s)
+    ring("Doodle/Coral", g, 16 * s, 165 * s, 26 * s, "#FB7185", weight=4.5 * s)
 
-    # 3 Golden Water Spout Droplets
-    P_DROP = "M 5 0 C 9 6, 9 13, 5 15 C 1 13, 1 6, 5 0 Z"
-    vec("SpoutL", g, P_DROP, 126 * s, 4 * s, 10 * s, 15 * s, GOLD, rotation=-22)
-    vec("SpoutM", g, P_DROP, 140 * s, 0 * s, 10 * s, 16 * s, GOLD, rotation=0)
-    vec("SpoutR", g, P_DROP, 154 * s, 4 * s, 10 * s, 15 * s, GOLD, rotation=22)
+    # Rear Fin
+    P_REAR_FIN = "M 0 0 C 14 10, 26 24, 22 40 C 10 40, -2 24, 0 0 Z"
+    vec("RearFin", g, P_REAR_FIN, 174 * s, 134 * s, 26 * s, 40 * s, BLUE_FIN2)
 
-    # Whale Body Vector (curved back, tail flukes on left, round forehead on right)
-    P_WHALE_BODY = (
-        "M 206 62 "
-        "C 206 32, 170 18, 130 18 "
-        "C 90 18, 62 36, 42 34 "
-        "C 28 32, 16 18, 6 6 "
-        "C 4 18, 10 32, 22 42 "
-        "C 10 44, 4 56, 8 68 "
-        "C 18 64, 28 54, 38 48 "
-        "C 46 72, 72 96, 108 100 "
-        "C 146 104, 184 94, 202 80 "
-        "C 206 74, 206 68, 206 62 Z"
+    # Whale Body
+    P_WHALE = (
+        "M 226 72 "
+        "C 226 36, 188 16, 144 16 "
+        "C 102 16, 74 38, 50 36 "
+        "C 34 34, 22 18, 10 6 "
+        "C 8 20, 16 38, 28 48 "
+        "C 16 52, 10 68, 14 82 "
+        "C 24 76, 36 64, 48 56 "
+        "C 56 86, 88 120, 134 124 "
+        "C 174 128, 208 114, 224 96 "
+        "C 226 88, 226 80, 226 72 Z"
     )
-    vec("Body", g, P_WHALE_BODY, 4 * s, 16 * s, 206 * s, 100 * s, BLUE, stroke=BLUE_DARK, weight=2.5 * s)
+    vec("WhaleBody", g, P_WHALE, 14 * s, 14 * s, 226 * s, 124 * s, BLUE_WHALE)
 
-    # Cream Underbelly (clean standalone path)
-    P_BELLY_CLEAN = "M 0 18 C 28 25, 60 17, 84 2 C 74 -6, 42 -8, 8 0 C 0 6, -2 12, 0 18 Z"
-    vec("Belly", g, P_BELLY_CLEAN, 122 * s, 88 * s, 84 * s, 26 * s, "#FFF9D2", stroke=BLUE_DARK, weight=2 * s)
+    # Lime Green Highlights on Tail Flukes
+    vec("TailMark1", g, "M 0 0 L 2 10", 34 * s, 34 * s, 3 * s, 10 * s, "none", stroke=LIME_SPOT, weight=2.8 * s, strokeCap="round")
+    vec("TailMark2", g, "M 0 0 L 2 10", 42 * s, 38 * s, 3 * s, 10 * s, "none", stroke=LIME_SPOT, weight=2.8 * s, strokeCap="round")
+    vec("TailMark3", g, "M 0 0 L 2 10", 78 * s, 46 * s, 3 * s, 10 * s, "none", stroke=LIME_SPOT, weight=2.8 * s, strokeCap="round")
+    vec("TailMark4", g, "M 0 0 L 2 10", 88 * s, 44 * s, 3 * s, 10 * s, "none", stroke=LIME_SPOT, weight=2.8 * s, strokeCap="round")
 
-    # 3 Belly Grooves
-    vec("Groove1", g, "M -0.5 0 L 0.5 14", 152 * s, 90 * s, 1 * s, 14 * s, "none", stroke=BLUE_DARK, weight=2 * s, strokeCap="round")
-    vec("Groove2", g, "M -0.5 0 L 0.5 14", 166 * s, 86 * s, 1 * s, 14 * s, "none", stroke=BLUE_DARK, weight=2 * s, strokeCap="round")
-    vec("Groove3", g, "M -0.5 0 L 0.5 12", 180 * s, 82 * s, 1 * s, 12 * s, "none", stroke=BLUE_DARK, weight=2 * s, strokeCap="round")
+    # Cream Underbelly with Golden Radiating Stripes
+    P_BELLY_SHAPE = "M 4 0 C 30 10, 52 26, 54 44 C 44 52, 22 52, 0 40 C 2 26, 4 12, 4 0 Z"
+    vec("BellyBase", g, P_BELLY_SHAPE, 168 * s, 78 * s, 54 * s, 52 * s, BELLY_CREAM, stroke=BLUE_DARK, weight=2.2 * s)
+    vec("BellyStripe1", g, "M 0 18 L 22 0", 176 * s, 88 * s, 22 * s, 18 * s, "none", stroke=GOLD_STRIPE, weight=3.5 * s, strokeCap="round")
+    vec("BellyStripe2", g, "M 0 24 L 28 0", 182 * s, 90 * s, 28 * s, 24 * s, "none", stroke=GOLD_STRIPE, weight=4.5 * s, strokeCap="round")
+    vec("BellyStripe3", g, "M 0 16 L 20 0", 196 * s, 100 * s, 20 * s, 16 * s, "none", stroke=GOLD_STRIPE, weight=3.5 * s, strokeCap="round")
 
-    # Pectoral Fin
-    P_FIN = "M 0 0 C 12 12, 18 30, 12 38 C 2 36, -4 20, 0 0 Z"
-    vec("Fin", g, P_FIN, 104 * s, 88 * s, 18 * s, 38 * s, BLUE, stroke=BLUE_DARK, weight=2.5 * s)
+    # Front Pectoral Fin
+    P_FRONT_FIN = "M 2 0 C 8 18, 12 40, 14 56 C 6 58, -2 42, 0 0 Z"
+    vec("FrontFin", g, P_FRONT_FIN, 134 * s, 94 * s, 16 * s, 58 * s, BLUE_WHALE, stroke=BLUE_DARK, weight=2.5 * s)
 
-    # Smiling Mouth with Dimple Tick (bold black line)
-    P_SMILE = "M 56 8 C 40 10, 14 6, 2 6 C 0 4, 2 0, 4 0"
-    vec("MouthSmile", g, P_SMILE, 144 * s, 72 * s, 56 * s, 10 * s, "none", stroke=BLACK, weight=3.5 * s, strokeCap="round")
+    # Two Cute Bead Eyes
+    oval("EyeL", g, 172 * s, 54 * s, 6.5 * s, 9.5 * s, INK, rotation=10)
+    oval("EyeR", g, 189 * s, 52 * s, 6.5 * s, 9.5 * s, INK)
 
-    # Single Glossy Eye
-    oval("Eye", g, (4 + 158) * s, (16 + 50) * s, 9 * s, 10 * s, BLACK)
-    oval("EyeGlint", g, (4 + 160) * s, (16 + 51) * s, 3.5 * s, 3.5 * s, WHITE)
+    # Smile with dimple tick
+    P_SMILE = "M 88 12 C 64 22, 22 16, 4 8 C 0 5, 2 0, 5 0"
+    vec("Smile", g, P_SMILE, 142 * s, 64 * s, 88 * s, 18 * s, "none", stroke=INK, weight=4.2 * s, strokeCap="round")
 
+    # Hand-drawn "WHALE" Text (Vector glyphs)
+    whale_text = box("WhaleLetters", g, 65 * s, 180 * s, 140 * s, 30 * s, "none", ref=f"whale_letters-{int(x)}")
+    P_W = "M 4 2 L 7 22 L 12 10 L 16 22 L 19 2 L 24 2 L 19 26 L 14 26 L 11 14 L 8 26 L 3 26 L 0 2 Z"
+    P_H = "M 0 2 L 5.5 2 L 5.5 11 L 13.5 11 L 13.5 2 L 19 2 L 19 26 L 13.5 26 L 13.5 16.5 L 5.5 16.5 L 5.5 26 L 0 26 Z"
+    P_A = "M 8 2 L 14 2 L 22 26 L 16.5 26 L 14.5 19.5 L 6.5 19.5 L 5 26 L 0 26 Z M 8.5 14 L 13 14 L 11 7 Z"
+    P_L = "M 0 2 L 5.5 2 L 5.5 20.5 L 17 20.5 L 17 26 L 0 26 Z"
+    P_E = "M 0 2 L 20 2 L 20 7.5 L 5.5 7.5 L 5.5 11.5 L 17 11.5 L 17 16.5 L 5.5 16.5 L 5.5 20.5 L 21 20.5 L 21 26 L 0 26 Z"
+
+    vec("Letter_W", whale_text, P_W, 0 * s, 0, 24 * s, 26 * s, INK)
+    vec("Letter_H", whale_text, P_H, 29 * s, 0, 19 * s, 26 * s, INK)
+    vec("Letter_A", whale_text, P_A, 53 * s, 0, 22 * s, 26 * s, INK)
+    vec("Letter_L", whale_text, P_L, 80 * s, 0, 17 * s, 26 * s, INK)
+    vec("Letter_E", whale_text, P_E, 102 * s, 0, 21 * s, 26 * s, INK)
     return g
-
-def tool_slot(slot, kind):
-    """Accurate drawing tool illustrations."""
-    if kind == "brush":
-        rect("Brush/Handle", slot, 26, 6, 14, 24, "#6B6B6B", radius=7)
-        rect("Brush/Ferrule", slot, 25, 28, 16, 7, "#B9B9B9", radius=2)
-        vec("Brush/Bristle", slot, P_BRISTLE, 24, 34, 18, 18, INK)
-    elif kind == "pencil":
-        rect("Pencil/Body", slot, 26, 6, 14, 26, GOLD, radius=[7, 7, 0, 0])
-        rect("Pencil/Band", slot, 26, 20, 14, 5, "#E08B2C")
-        vec("Pencil/Wood", slot, P_TRI, 26, 31, 14, 15, WOOD)
-        vec("Pencil/Lead", slot, P_TRI, 29.5, 40, 7, 7, INK)
-    elif kind == "crayon":
-        rect("Crayon/Body", slot, 26, 8, 14, 26, BLACK, radius=[6, 6, 0, 0])
-        rect("Crayon/Band", slot, 26, 18, 14, 6, "#4A4A4A")
-        vec("Crayon/Tip", slot, P_TRI, 26, 33, 14, 14, "#111111")
-    else:
-        # Angled eraser with blue top, white stripe, pink base
-        box("EraserBlock", slot, 18, 12, 30, 40, "#38BDF8", radius=4, rotation=24, ref=f"eraser-{slot}")
-        rect("Eraser/Stripe", f"eraser-{slot}", 0, 16, 30, 8, WHITE)
-        rect("Eraser/Pink", f"eraser-{slot}", 0, 24, 30, 16, "#FF7B98", radius=[0, 0, 4, 4])
 
 # ================================================================ screen 1 (Home)
 S1 = "S1"
 box("Screen/1 - Home", None, 0, 0, 390, 844, WHITE, radius=40, clip=True, ref=S1)
 
 box("Hero", S1, 0, 0, 390, 305, HERO, radius=[40, 40, 36, 36], clip=True, ref="hero")
-# Cheese-like organic cutout bubbles on top-left
 oval("Hero/Cheese1", "hero", 10, 110, 60, 60, HERO_DEEP, opacity=0.45)
 oval("Hero/Cheese2", "hero", 44, 165, 42, 42, HERO_DEEP, opacity=0.4)
 oval("Hero/Cheese3", "hero", 6, 195, 48, 48, HERO_DEEP, opacity=0.35)
 rect("Hero/Paper1", "hero", 300, 186, 42, 48, "#FDE7B4", radius=6, rotation=-14, opacity=0.9)
 rect("Hero/Paper2", "hero", 326, 212, 32, 36, "#FFF2CF", radius=5, rotation=12, opacity=0.9)
 
-# Cookie Avatar
 oval("Avatar/Ring", S1, 24, 44, 48, 48, "#FFF3DA")
 oval("Avatar/Cookie", S1, 31, 51, 34, 34, "#E3A765")
 for i, (ax, ay) in enumerate(((38, 60), (48, 56), (52, 68), (41, 71))):
@@ -399,24 +354,18 @@ for i, (ax, ay) in enumerate(((38, 60), (48, 56), (52, 68), (41, 71))):
 label(S1, 84, 46, "Hi,", size=12, style="Medium", color="#A8792B")
 label(S1, 84, 62, "Tiffany", size=19, style="Bold", color="#3A2D14")
 
-# Notification Bell with orange top badge
 box("Button/Bell", S1, 318, 44, 48, 48, WHITE, radius=18, effects=SHADOW_SOFT, ref="bell")
 vec("Icon/Bell", "bell", P_BELL, 13, 12, 22, 24, HERO_DEEP)
 oval("Bell/OrangeDot", "bell", 30, 8, 10, 10, ORANGE_HOT)
 
-# Giant Diagonal Pencil in Hero
 pencil_giant(S1, 70, 220, length=210, rotation=22, name="HeroPencil")
-
-# Axolotl Mascot sitting on pencil
 axolotl_cute(S1, 76, 134, scale=1.05, pose="sitting", with_pencil=True, name="Character/Axolotl-Hero")
 
-# Speech Bubble
 box("Bubble", S1, 224, 130, 136, 64, WHITE, radius=20, effects=SHADOW_SOFT, ref="bubble")
 label("bubble", 18, 12, "Let's start", size=14, style="Bold", color="#3A2D14")
 label("bubble", 18, 32, "Drawing!", size=14, style="Bold", color="#3A2D14")
 vec("Bubble/Tail", S1, "M0 0 L16 4 L4 14 Z", 212, 168, 16, 14, WHITE)
 
-# Little Artist Card with Trophy
 box("Card/Progress", S1, 24, 260, 342, 96, WHITE, radius=24, effects=SHADOW_CARD, ref="prog")
 label("prog", 20, 20, "Little Artist", size=15, style="Bold")
 trophy("prog", 112, 16, scale=1.0, name="ProgTrophy")
@@ -427,7 +376,6 @@ label("prog", 254, 53, "13/40", size=11, style="Medium", color=INK_SOFT)
 box("Pill/Lv1", "prog", 294, 48, 46, 24, BLACK, radius=12, ref="lv1")
 label("lv1", 10, 6, "Lv 1", size=11, style="Bold", color=WHITE)
 
-# Category Icons
 CATS = [
     ("Animals", "#FDE3C7", "cat"),
     ("Cars", "#D9ECFA", "car"),
@@ -463,7 +411,6 @@ for cname, tint, glyph in CATS:
         vec("More/Spark", disc, P_SPARK, 15, 15, 26, 26, "#B5AFA3")
     label(cell, None, None, cname, size=11, style="Medium", color="#6E6A63")
 
-# Daily Challenges Section
 label(S1, 24, 464, "Daily challenges", size=15, style="Bold")
 for i, (dx, dy) in enumerate(((306, 468), (314, 468), (306, 476), (314, 476))):
     rect(f"Grid/Dot{i}", S1, dx, dy, 6, 6, "#C9C3B8", radius=2)
@@ -479,8 +426,10 @@ for title, sub, energy, tint, glyph in CHALLENGES:
     card = row(f"Card/{title[:12]}", "list", None, None, 342, 70, gap=12, pad=[12, 14, 12, 14], main="min", cross="center", fill=WHITE, radius=20, stroke=BORDER, ref=f"card-{glyph}")
     disc = box("Icon/Disc", card, None, None, 44, 44, tint, radius=22, ref=f"cd-{glyph}")
     if glyph == "whale":
-        vec("Icon/MiniWhale", disc, "M4 14 C4 6, 14 2, 26 2 C36 2, 42 6, 44 12 C36 14, 30 18, 22 18 C14 18, 4 16, 4 14 Z", 6, 14, 32, 16, BLUE)
-        oval("Icon/WhaleEye", disc, 30, 18, 3, 3, WHITE)
+        # Mini cartoon whale matching the main whale
+        vec("MiniWhaleBody", disc, "M 2 12 C 2 4, 14 0, 26 0 C 34 0, 38 4, 40 8 C 32 10, 26 14, 20 14 C 12 14, 2 13, 2 12 Z", 4, 15, 36, 14, BLUE_WHALE)
+        oval("MiniWhaleBelly", disc, 24, 21, 10, 7, BELLY_CREAM)
+        oval("MiniWhaleEye", disc, 32, 18, 2.5, 3, INK)
     else:
         vec("Mini/Arc1", disc, P_RAINBOW_1, 7, 14, 30, 16, "#F2705B")
         vec("Mini/Arc2", disc, P_RAINBOW_2, 12, 19, 20, 11, "#5BBCE4")
@@ -493,7 +442,6 @@ for title, sub, energy, tint, glyph in CHALLENGES:
     chk = box("Check", meta, None, None, 36, 36, "#FFF6E0", radius=13, stroke="#F5C95C", ref=f"ck-{glyph}")
     vec("Icon/Check", chk, P_CHECK, 9, 10, 18, 16, "#F0A32B")
 
-# Card 3 (Flying car)
 box("Card/FlyingCar", S1, 24, 662, 342, 70, WHITE, radius=20, stroke=BORDER, ref="card3")
 box("Icon/Disc3", "card3", 14, 13, 44, 44, "#FBC9A4", radius=22, ref="cd3")
 rect("Mini/CarCabin", "cd3", 15, 12, 15, 11, "#F7A07A", radius=[6, 6, 0, 0])
@@ -503,7 +451,6 @@ oval("Mini/CarWheelL", "cd3", 11, 28, 8, 8, "#A84B22")
 oval("Mini/CarWheelR", "cd3", 25, 28, 8, 8, "#A84B22")
 label("card3", 70, 22, "Invent a Flying Car!", size=13.5, style="Bold")
 
-# Bottom Navigation
 row("Nav/Bar", S1, 16, 752, 358, 70, gap=0, pad=[10, 26, 10, 26], main="spaceBetween", cross="center", fill=WHITE, radius=28, effects=SHADOW_NAV, ref="nav")
 for nname, glyph, active in (("Home", P_HOUSE, True), ("Stars", None, False), ("Ranks", P_BARS, False)):
     tint = GREEN_NAV if active else "#C9C3B8"
@@ -514,60 +461,117 @@ for nname, glyph, active in (("Home", P_HOUSE, True), ("Stars", None, False), ("
         star(f"Nav/{nname}/Icon", cell, None, None, 25, tint, inner=0.45)
     label(cell, None, None, nname, size=11, style="Bold", color=GREEN_NAV if active else "#A8A29A")
 
-# ================================================================ screen 2 (Draw Screen)
+# ================================================================ screen 2 (Draw Screen - NEW & EXACT)
 S2 = "S2"
 box("Screen/2 - Draw", None, 470, 0, 390, 844, CANVAS, radius=40, clip=True, ref=S2)
 
-box("Canvas/DotGrid", S2, 0, 0, 390, 844, "none", ref="dotgrid")
-for gx in range(0, 10):
-    for gy in range(0, 16):
-        oval(f"Dot/{gx}-{gy}", "dotgrid", 22 + gx * 39, 110 + gy * 36, 3.4, 3.4, "#E8DEC8", opacity=0.75)
+box("Canvas/DotGrid", S2, 0, 0, 390, 844, "none", ref="dotgrid2")
+for gx in range(0, 11):
+    for gy in range(0, 18):
+        oval(f"Dot2/{gx}-{gy}", "dotgrid2", 20 + gx * 35, 100 + gy * 35, 3.2, 3.2, "#E8DFD0", opacity=0.8)
 
-box("Button/Back2", S2, 24, 44, 48, 48, HERO_DEEP, radius=24, ref="back2")
-vec("Icon/Back2", "back2", P_BACK, 15, 12, 20, 24, WHITE)
+# Header
+box("Button/Back2", S2, 24, 44, 48, 48, HERO_DEEP, radius=18, ref="back2")
+vec("Icon/BackArrow2", "back2", P_SOLID_ARROW, 14, 13, 20, 22, "#4A3200")
 
-row("Pill/Title", S2, 88, 44, 214, 48, gap=10, pad=[6, 14, 6, 10], main="min", cross="center", fill=WHITE, radius=24, effects=SHADOW_SOFT, ref="title2")
-# Mini axolotl face in title pill
-m_axo = box("MiniAxo", "title2", None, None, 34, 34, "none", ref="mini-axo-title")
-oval("Mini/Gill1", m_axo, 0, 10, 11, 7, PINK)
-oval("Mini/Gill2", m_axo, 23, 10, 11, 7, PINK)
-oval("Mini/Head", m_axo, 6, 6, 22, 20, PINK_LT)
-oval("Mini/EyeL", m_axo, 12, 13, 3.4, 4, INK)
-oval("Mini/EyeR", m_axo, 20, 13, 3.4, 4, INK)
-label("title2", None, None, "Draw a Whale", size=14.5, style="Bold")
+row("Pill/Title2", S2, 86, 44, 218, 48, gap=8, pad=[4, 14, 4, 10], main="min", cross="center", fill=WHITE, radius=24,
+    effects=[{"type": "dropShadow", "color": "#00000012", "offset": [0, 4], "radius": 12}], ref="title2")
 
-box("Button/Trash", S2, 318, 44, 48, 48, RED, radius=24, ref="trash2")
-vec("Icon/Trash", "trash2", P_TRASH, 13, 12, 22, 24, WHITE)
+m2 = box("MiniMascot2", "title2", None, None, 44, 38, "none", ref="minimascot2")
+vec("MiniWand2", m2, "M 2 16 L 16 2", 2, 8, 14, 14, "none", stroke="#F59E0B", weight=2.2)
+star("MiniStar2", m2, 12, 4, 11, "#FBBF24", points=4, inner=0.42)
+oval("MGillL1_2", m2, 10, 14, 8, 5, "#FF7B98", rotation=-20)
+oval("MGillL2_2", m2, 8, 20, 8, 5, "#FF7B98", rotation=0)
+oval("MGillR1_2", m2, 34, 14, 8, 5, "#FF7B98", rotation=20)
+oval("MGillR2_2", m2, 36, 20, 8, 5, "#FF7B98", rotation=0)
+rect("MBody2", m2, 19, 24, 16, 12, "#FF2A7A", radius=[4, 4, 2, 2])
+oval("MHead2", m2, 15, 10, 24, 19, "#FFA8BE")
+oval("MEyeL2", m2, 20, 15, 2.5, 3.2, INK)
+oval("MEyeR2", m2, 28, 15, 2.5, 3.2, INK)
+vec("MMouth2", m2, "M 21 22 C 23 25, 27 25, 29 22", 19, 21, 10, 5, "#881337", stroke="#881337", weight=1.5)
+label("title2", None, None, "Draw a Whale", size=15, style="Bold", color=INK)
 
-# Accurate Whale Drawing in Screen 2
-whale_drawing_accurate(S2, 85, 290, scale=1.0)
-label(S2, 122, 455, "WHALE", size=40, style="Bold", color=BLACK, family=CHALK)
+box("Button/Trash2", S2, 318, 44, 48, 48, RED, radius=18, ref="trash2")
+rect("TrashLid2", "trash2", 14, 14, 20, 4, WHITE, radius=2)
+rect("TrashHandle2", "trash2", 21, 11, 6, 4, WHITE, radius=[2, 2, 0, 0])
+rect("TrashBody2", "trash2", 16, 19, 16, 17, WHITE, radius=[0, 0, 4, 4])
+rect("TrashRib1_2", "trash2", 19, 23, 2, 9, RED, radius=1)
+rect("TrashRib2_2", "trash2", 23, 23, 2, 9, RED, radius=1)
+rect("TrashRib3_2", "trash2", 27, 23, 2, 9, RED, radius=1)
 
-box("Button/Transform", S2, 118, 570, 154, 48, GREEN, radius=24, effects=SHADOW_SOFT, ref="transform")
-label("transform", 22, 14, "Transform!", size=15, style="Bold", color=WHITE)
-vec("Icon/Spark", "transform", P_SPARK, 116, 15, 18, 18, "#FFF4C2")
+# Exact Whale Drawing
+build_whale_drawing(S2, 60, 270, scale=1.0, name="WhaleArt2")
 
-box("Toolbar", S2, 24, 672, 342, 150, WHITE, radius=30, effects=SHADOW_CARD, ref="toolbar")
-SWATCHES = [BLACK, BLUE_LT, PINK, PURPLE, "#F3EAD7", "#2E7D4F", "#8DD98D", RED, ORANGE_HOT, GOLD]
-row("Row/Swatches", "toolbar", 18, 18, 306, 26, gap=6, main="spaceBetween", cross="center", ref="swatches")
-for i, color in enumerate(SWATCHES):
-    oval(f"Swatch/{i}", "swatches", None, None, 24, 24, color, stroke="#E2DACB" if color == "#F3EAD7" else None, weight=1.5)
+# Transform button
+btn2 = box("Button/Transform2", S2, 115, 565, 160, 48, GREEN_BTN, radius=24,
+           effects=[{"type": "dropShadow", "color": GREEN_GLOW, "offset": [0, 6], "radius": 16}], ref="transform_btn2")
+label("transform_btn2", 22, 14, "Transform!", size=15, style="Bold", color=WHITE)
+star("TransformSpark1_2", "transform_btn2", 118, 16, 14, WHITE, points=4, inner=0.45)
+star("TransformSpark2_2", "transform_btn2", 134, 24, 9, WHITE, points=4, inner=0.45)
 
-row("Tray/Tools", "toolbar", 16, 56, 310, 80, gap=8, pad=8, main="spaceBetween", cross="center", fill=HERO_DEEP, radius=24, ref="tray")
-for kind in ("brush", "pencil", "crayon", "eraser"):
-    slot = box(f"Tool/{kind}", "tray", None, None, 66, 64, WHITE, radius=18, ref=f"tool-{kind}")
-    tool_slot(slot, kind)
-oval("Tool/ActiveDot", "toolbar", 168, 140, 6, 6, BLACK)
+# Toolbar
+tb2 = box("Toolbar2", S2, 20, 650, 350, 170, WHITE, radius=36,
+          effects=[{"type": "dropShadow", "color": "#00000014", "offset": [0, 8], "radius": 24}], ref="toolbar2")
+
+swatches_row2 = row("Row/Swatches2", "toolbar2", 16, 18, 318, 32, gap=6, main="spaceBetween", cross="center", ref="swatches2")
+PALETTE2 = [
+    ("#18181B", False),
+    ("#38BDF8", True),
+    ("#FF8DA1", False),
+    ("#A855F7", False),
+    ("#F5EBE1", False),
+    ("#0D6832", False),
+    ("#A7F3D0", False),
+    ("#EF4444", False),
+    ("#F97316", False),
+    ("#FBBF24", False),
+]
+for i, (color, is_selected) in enumerate(PALETTE2):
+    sw_box = box(f"SwatchBox2/{i}", "swatches2", None, None, 26, 26, "none", ref=f"swbox2-{i}")
+    if is_selected:
+        ring("RingSelected2", sw_box, 0, 0, 26, "#BAE6FD", weight=2)
+        oval("SwatchCircle2", sw_box, 3, 3, 20, 20, color)
+    else:
+        oval("SwatchCircle2", sw_box, 1, 1, 24, 24, color, stroke="#E7E5E4" if color == "#F5EBE1" else None, weight=1)
+
+tray2 = box("Tray/Tools2", "toolbar2", 14, 58, 322, 94, HERO_DEEP, radius=28, ref="tray2")
+slots_row2 = row("Slots2", "tray2", 10, 8, 302, 78, gap=8, main="spaceBetween", cross="center", ref="slots2")
+
+# Slot 1: Paintbrush
+s1_2 = box("Slot/Brush2", "slots2", None, None, 68, 76, WHITE, radius=22, ref="slot_brush2")
+rect("BrushHandle2", s1_2, 30, 42, 8, 22, "#D97706", radius=[2, 2, 4, 4])
+rect("BrushFerrule2", s1_2, 28, 36, 12, 6, "#94A3B8", radius=1)
+vec("BrushBristle2", s1_2, "M 0 20 C -4 14, -6 6, 0 0 C 6 6, 4 14, 0 20 Z", 34, 16, 16, 20, "#334155")
+
+# Slot 2: Pencil
+s2_2 = box("Slot/Pencil2", "slots2", None, None, 68, 76, WHITE, radius=22, ref="slot_pencil2")
+rect("PencilBody2", s2_2, 27, 36, 14, 28, "#F59E0B", radius=[2, 2, 4, 4])
+rect("PencilStripe2", s2_2, 32, 36, 4, 28, "#FCD34D")
+vec("PencilWood2", s2_2, "M 0 16 L 7 0 L 14 16 Z", 27, 20, 14, 16, "#FDE68A")
+vec("PencilLead2", s2_2, "M 0 6 L 4 0 L 8 6 Z", 30, 20, 8, 6, "#1E293B")
+
+# Slot 3: Crayon/Marker (ACTIVE)
+s3_2 = box("Slot/Marker2", "slots2", None, None, 68, 76, "#FEF3C7", radius=22, ref="slot_marker2")
+rect("MarkerBody2", s3_2, 27, 34, 14, 34, "#1E293B", radius=[2, 2, 4, 4])
+rect("MarkerCapBand2", s3_2, 26, 30, 16, 5, "#334155", radius=1)
+vec("MarkerTip2", s3_2, "M 0 14 L 6 0 L 12 14 Z", 28, 16, 12, 14, "#0F172A")
+
+# Slot 4: Eraser
+s4_2 = box("Slot/Eraser2", "slots2", None, None, 68, 76, WHITE, radius=22, ref="slot_eraser2")
+er2 = box("EraserTilted2", s4_2, 18, 18, 32, 42, "none", rotation=30, ref="er_tilted2")
+rect("EraserBlue2", er2, 0, 0, 30, 16, "#0284C7", radius=[4, 4, 0, 0])
+rect("EraserWhite2", er2, 0, 16, 30, 8, WHITE)
+rect("EraserPink2", er2, 0, 24, 30, 18, "#F43F5E", radius=[0, 0, 4, 4])
+
+oval("Dot/ActiveIndicator2", "toolbar2", 172, 156, 6, 6, INK)
 
 # ================================================================ screen 3 (Completed)
 S3 = "S3"
 box("Screen/3 - Completed", None, 940, 0, 390, 844, HERO, radius=40, clip=True, ref=S3)
 
-# Golden Sunburst Rays
 for i in range(13):
     vec(f"Ray/{i}", S3, "M16 0L32 440H0z", 170 + (i - 6) * 10, -70, 64, 560, HERO_SOFT, rotation=(i - 6) * 12, opacity=0.6)
 
-# Confetti Rectangles
 CONFETTI = [("#F2705B", 30, 120, 10, 14, 20), ("#5BBCE4", 320, 150, 12, 12, -14),
             ("#8DD98D", 60, 210, 9, 13, 36), ("#A98BE8", 300, 236, 11, 11, 22),
             ("#F6453D", 96, 128, 8, 12, -28), ("#4CC764", 268, 112, 10, 10, 14),
@@ -577,13 +581,11 @@ CONFETTI = [("#F2705B", 30, 120, 10, 14, 20), ("#5BBCE4", 320, 150, 12, 12, -14)
 for i, (color, cx, cy, cw, ch, rot) in enumerate(CONFETTI):
     rect(f"Confetti/{i}", S3, cx, cy, cw, ch, color, radius=3, rotation=rot, opacity=0.95)
 
-# Pencil tip peeking out behind card at bottom-left
 box("Deco/Pencil", S3, -10, 560, 36, 110, "none", rotation=35, ref="deco-pencil")
 rect("Deco/PencilShaft", "deco-pencil", 0, 0, 24, 80, GOLD, radius=[4, 4, 0, 0])
 vec("Deco/PencilWood", "deco-pencil", "M0 0 L12 24 L24 0 Z", 0, 80, 24, 24, WOOD)
 vec("Deco/PencilLead", "deco-pencil", "M4 0 L12 16 L20 0 Z", 0, 88, 24, 16, BLACK)
 
-# Marker pen tip peeking out on right
 box("Deco/Marker", S3, 350, 330, 30, 90, "none", rotation=-35, ref="deco-marker")
 rect("Deco/MarkerBody", "deco-marker", 4, 26, 22, 64, BLACK, radius=[0, 0, 4, 4])
 vec("Deco/MarkerTip", "deco-marker", "M0 26 L11 0 L22 26 Z", 4, 0, 22, 26, "#333333")
@@ -594,30 +596,27 @@ label(S3, 88, 56, "Challenge Completed!", size=17, style="Bold", color=INK)
 box("Button/Retry", S3, 318, 44, 48, 48, WHITE, radius=24, effects=SHADOW_SOFT, ref="retry")
 vec("Icon/Retry", "retry", P_REDO, 13, 12, 22, 24, ORANGE)
 
-# The White Stats Card
 box("Card/Result", S3, 24, 250, 342, 420, WHITE, radius=32, effects=SHADOW_CARD, ref="result")
 
-# ---------------------------------------------------------------- POLAROID PHOTO
-# True Polaroid frame overlapping the top of the card
+# Polaroid Photo
 pola = box("Frame/Polaroid", S3, 105, 80, 180, 205, WHITE, radius=16, effects=SHADOW_POLA, rotation=3, ref="polaroid")
-# Photo insert
 photo = box("Photo", pola, 12, 12, 156, 152, BLUE_DEEP, radius=8, clip=True, ref="photo-inner")
 oval("Photo/Glow", photo, 20, 20, 116, 90, "#1976D2")
 vec("CoralL", photo, P_CORAL, 10, 96, 24, 56, "#FF6584")
 vec("CoralR", photo, P_CORAL, 122, 92, 22, 60, "#4DD0E1")
 vec("CoralM", photo, P_CORAL, 68, 116, 18, 36, "#81D4FA")
-whale_drawing_accurate(photo, 14, 38, scale=0.62, name="PhotoWhale")
+# Scaled down cartoon whale in underwater photo
+build_whale_drawing(photo, -15, 15, scale=0.68, name="PhotoWhale")
 for i, (bx, by, br) in enumerate(((26, 28, 5), (120, 36, 7), (140, 78, 4), (46, 70, 4))):
     oval(f"Bubble{i}", photo, bx, by, br, br, WHITE, opacity=0.6)
 vec("Photo/CornerFold", photo, "M 0 0 L 26 0 L 26 26 Z", 130, 0, 26, 26, "#E1F5FE")
 vec("Polaroid/Clip", pola, P_CLIP, 142, -8, 28, 36, "#E5A93C", rotation=16)
 
-# 3 Golden 3D Stars (overlapping bottom of polaroid and top of white card)
+# 3 Golden 3D Stars
 star("Star/Left", S3, 110, 256, 48, GOLD, inner=0.44, rotation=-14, stroke=GOLD_DARK, weight=2.5)
 star("Star/Right", S3, 232, 256, 48, GOLD, inner=0.44, rotation=14, stroke=GOLD_DARK, weight=2.5)
 star("Star/Mid", S3, 165, 236, 60, GOLD, inner=0.44, stroke=GOLD_DARK, weight=2.5)
 
-# Contents inside Card/Result (relative to result frame at y=250)
 label("result", 112, 62, "Little Artist", size=15, style="Bold")
 trophy("result", 192, 56, scale=1.05, name="ResultTrophy")
 
@@ -658,9 +657,7 @@ label("result", 22, 312, "Amazing creativity!", size=12, style="Bold")
 vec("Icon/Share", "result", P_PLANE, 22, 342, 18, 18, INK)
 label("result", 46, 342, "Share", size=13.5, style="Bold")
 
-# Axolotl Winner with magic star wand
 ax_win = axolotl_cute(S3, 264, 550, scale=0.88, pose="normal", with_pencil=False, name="Character/Axolotl-Win")
-# Magic wand in hand
 vec("Wand", S3, "M0 0 L16 16", 260, 584, 16, 16, "none", stroke="#FFD54F", weight=3.5)
 star("WandStar", S3, 272, 594, 16, GOLD, points=4, inner=0.35)
 
@@ -668,16 +665,14 @@ box("Button/KeepDrawing", S3, 24, 692, 342, 60, BLACK, radius=22, effects=SHADOW
 label("cta", 108, 20, "Keep Drawing", size=16, style="Bold", color=WHITE)
 
 # ================================================================ THE BIG OVERLAPPING MASCOT
-# Positioned between Screen 1 and Screen 2 on the canvas (top level)
-# Waving arm towards Screen 1 Home button, hot pink shirt, lavender shorts
 axolotl_cute(None, 245, 630, scale=1.55, pose="waving_left", with_pencil=False, name="Showcase/Mascot-Big")
 
 # ---------------------------------------------------------------- emit script
 script = [
     {"command": "page.setBackground", "params": {"color": CREAM}},
     {"command": "page.rename", "params": {"name": "Kids Drawing App"}},
-    {"command": "command.batch", "params": {"label": "Build kids drawing app v3", "commands": steps}},
+    {"command": "command.batch", "params": {"label": "Build kids drawing app complete", "commands": steps}},
 ]
-with open("/tmp/figcraft_build/ui_script_v3.json", "w") as fh:
+with open("/tmp/figcraft_build/ui_script_complete.json", "w") as fh:
     json.dump(script, fh, indent=1)
-print("v3 steps:", len(steps))
+print("Complete app steps:", len(steps))
