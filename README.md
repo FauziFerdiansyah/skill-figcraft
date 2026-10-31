@@ -6,9 +6,7 @@
 
 A production-grade, battle-tested **Model Context Protocol (MCP) Skill Suite** that empowers AI coding assistants (Google Antigravity, Claude Code, Kiro, Cursor) to design, construct, prototype, and audit native **[FigCraft](https://github.com/storytold/figcraft)** interface files (`.figcraft`).
 
----
-
-## ⚡ Why This Suite?
+---\n\n## 📸 Example Showcase\n\nHere is an example mobile homescreen design reconstructed directly from a reference image using this skill suite via FigCraft MCP:\n\n<p align=\"center\">\n  <img src=\"examples/preview.png\" width=\"320\" alt=\"FigCraft Generated Preview\">\n</p>\n\n*The native design file with 100+ vector and frame layers is available at [`examples/ui.figcraft`](examples/ui.figcraft).*\n\n---
 
 FigCraft is an open-source, high-performance, offline-first interface design tool written in Rust (a Figma-class desktop app). Its built-in MCP server (`figcraft-cli mcp`) allows AI agents to directly create nodes, manipulate vectors, and wire interactive prototypes.
 
