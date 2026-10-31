@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "figcraft": {
+      "command": "/Users/USERNAME/.local/bin/figcraft-cli",
+      "args": [
+        "mcp"
+      ],
+      "description": "Headless in-process FigCraft engine session for AI assistants (no GUI window needed)."
+    },
+    "figcraft-app": {
+      "command": "/Users/USERNAME/.local/bin/figcraft-cli",
+      "args": [
+        "mcp",
+        "--attach",
+        "7979"
+      ],
+      "description": "Connects live to the running FigCraft desktop app started with `figcraft --control 7979`."
+    }
+  }
+}
