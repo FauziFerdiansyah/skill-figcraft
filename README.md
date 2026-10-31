@@ -10,7 +10,17 @@ A production-grade, battle-tested **Model Context Protocol (MCP) Skill Suite** t
 
 ## 📸 Example Showcase
 
-Here is an example mobile homescreen design reconstructed directly from a reference image using this skill suite via FigCraft MCP:
+### 1. Kids Drawing App (3-Screen Flow + Mascot)
+A multi-screen flow featuring Home screen with diagonal pencil hero, Draw screen with vector whale & color tools, and Challenge Completed screen with Polaroid artwork & 3D stars:
+
+<p align="center">
+  <img src="examples/kids-drawing-app-preview.png" width="850" alt="Kids Drawing App 3-Screen Preview">
+</p>
+
+*Native design file:* [`examples/kids-drawing-app.figcraft`](examples/kids-drawing-app.figcraft) · *Reproducible builder script:* [`examples/kids-drawing-app-build.py`](examples/kids-drawing-app-build.py)
+
+### 2. Mobile Home & Habit Tracker
+An example mobile homescreen design reconstructed directly from a reference image using this skill suite via FigCraft MCP:
 
 <p align="center">
   <img src="examples/preview.png" width="320" alt="FigCraft Generated Preview">
