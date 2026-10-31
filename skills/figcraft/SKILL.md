@@ -8,8 +8,14 @@ description: Coordinates end-to-end FigCraft work from one or more visual refere
 Use FigCraft as a Figma-class design and prototyping tool. Route work through:
 
 1. `figcraft-builder` for references, screens, components, and visual states.
-2. `figcraft-prototyper` when the request includes navigation, scrolling, buttons, overlays, alerts, forms, or state changes.
-3. `figcraft-review` before reporting completion.
+2. `figcraft-svg` when the reference contains illustrations, characters, mascots, logos, or organic artwork.
+3. `figcraft-icons` when the design needs interface icons.
+4. `figcraft-typography` when the typeface matters or a family must be installed.
+5. `figcraft-prototyper` when the request includes navigation, scrolling, buttons, overlays, alerts, forms, or state changes.
+6. `figcraft-motion` as the final polish pass, only after the flows are wired and verified.
+7. `figcraft-review` before reporting completion.
+
+Build structure before artwork, artwork before motion. Do not tune transitions on a flow that is not yet correct.
 
 Do not claim completion after saving alone. Verify the design tree, visual result, and every required interaction.
 
@@ -34,6 +40,46 @@ Never invent a command, property, trigger, action, or runtime capability.
 - **Hotspot:** The layer that owns a prototype interaction. Prefer the visible interactive container itself.
 
 A document page may contain several screen frames. Do not treat every screen as a separate document page unless the user asks for that organization.
+
+## Device Frames and Sizes
+
+Never invent a screen size. The engine ships real device presets: `frame.presets` lists them, and `frame.create {preset}` creates a frame at that exact size. Call `frame.presets` and use a listed name, because the catalog changes between releases.
+
+Verified presets at the time of writing, by category:
+
+| Category | Preset | Size |
+|---|---|---|
+| Phone | iPhone 17 / 17 Pro | 402 × 874 |
+| Phone | iPhone 17 Pro Max | 440 × 956 |
+| Phone | iPhone Air | 420 × 912 |
+| Phone | iPhone 16 | 393 × 852 |
+| Phone | iPhone 16 Plus | 430 × 932 |
+| Phone | iPhone SE | 320 × 568 |
+| Phone | Android Compact | 412 × 917 |
+| Phone | Android Medium | 700 × 840 |
+| Tablet | iPad mini 8.3 | 744 × 1133 |
+| Tablet | iPad Pro 11" | 834 × 1194 |
+| Tablet | iPad Pro 12.9" | 1024 × 1366 |
+| Tablet | Surface Pro 8 | 1440 × 960 |
+| Tablet | Android Expanded | 1280 × 800 |
+| Desktop | MacBook Air | 1280 × 832 |
+| Desktop | MacBook Pro 14" | 1512 × 982 |
+| Desktop | MacBook Pro 16" | 1728 × 1117 |
+| Desktop | Desktop | 1440 × 1024 |
+| Desktop | TV | 1280 × 720 |
+| Watch | Apple Watch 41 / 45 / 42 mm | 176 × 215 / 198 × 242 / 187 × 223 |
+| Presentation | Slide 16:9 | 1920 × 1080 |
+| Presentation | Slide 4:3 | 1024 × 768 |
+| Paper | A4 / A5 / A6 | 595 × 842 / 420 × 595 / 297 × 420 |
+
+Choosing a target:
+
+- Match the device the reference actually depicts. A tall phone mockup is not a tablet.
+- When the user names a platform but no device, pick the current mainstream preset for it and say which you used: a modern iPhone for iOS, Android Compact for Android, Desktop 1440 × 1024 for web.
+- Desktop web work is a viewport, not a device. Lay out content on a centered container inside the frame and state the container width and gutters.
+- For responsive work, build each requested breakpoint as its own frame from its own preset, and keep layer names identical across them so component and motion pairing still work.
+- Sizes are points, not physical pixels. Design at 1x and let export scale.
+- Ask before adding breakpoints nobody requested.
 
 ## Intake and Scope Gate
 
@@ -70,7 +116,10 @@ Do not promise free-form text entry in prototype playback unless a current FigCr
 Before reporting completion:
 
 - Every approved reference maps to an implemented screen, state, or overlay.
+- Screens use a real device preset, or a size the user specified.
 - Visual hierarchy, copy, assets, layout, and viewport match the reference or approved specification.
+- Illustrations and icons are real artwork, not placeholder shapes, and their origin is reported.
+- No text renders in a silent font fallback.
 - Required sliders scroll; required buttons have the intended action.
 - Navigation destinations exist and required flows are reachable.
 - Every overlay has the required open and close paths.

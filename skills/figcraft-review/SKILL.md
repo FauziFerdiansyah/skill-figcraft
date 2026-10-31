@@ -42,7 +42,24 @@ When references were supplied, verify:
 
 Result: `PASS`, `FAIL`, or `NOT APPLICABLE`.
 
-## 3. Prototype Correctness Gate
+## 3. Asset, Type, and Size Gate
+
+Check:
+
+- screens use a real device preset from `frame.presets`, or a size the user specified;
+- responsive variants, when requested, each come from their own preset and keep layer names aligned;
+- illustrations and characters are real vector artwork, not primitives stacked to imitate curves, and authored artwork is reported as an interpretation rather than a reproduction;
+- interface icons come from one icon set, with consistent weight, size box, and color role, and no icon frame is empty from a failed fetch;
+- icons that carry state, such as selected versus inactive, differ the way the reference shows;
+- supplied assets were imported rather than redrawn;
+- imported SVG layers were renamed from `Group` and `Vector`, and `currentColor` black was recolored;
+- `text.missingFonts` is empty, or every remaining entry is reported with a reason;
+- no face was silently substituted, meaning font `warnings` were resolved or reported;
+- text roles follow one scale instead of ad hoc sizes per layer.
+
+Result: `PASS`, `FAIL`, or `NOT APPLICABLE`.
+
+## 4. Prototype Correctness Gate
 
 Keep this as a pass/fail gate outside the 100-point visual score. A polished design with broken behavior must not receive an unconditional approval.
 
@@ -59,23 +76,25 @@ Check:
 - hotspots align with the final visible controls, meet target size, and do not overlap unrelated controls;
 - no stale IDs, orphan destinations, duplicate interactions, or unreachable required states remain;
 - editable input is not claimed when the implementation only simulates input states;
+- motion is consistent per journey, exits are not slower than entrances, nothing routine runs past roughly 400 ms, and `smartAnimate` pairs are named and nested identically across frames;
 - interaction verdicts cite inspected interaction data; a successful `proto.preview` call is not accepted as runtime evidence, and remaining click-through checks are listed for the user.
 
 Result: `PASS`, `FAIL`, or `NOT APPLICABLE`.
 
-## 4. Workflow
+## 5. Workflow
 
 1. Inspect the document with `inspect_document`; use `allPages: true` when several pages are in scope.
 2. Use `get_node` for truncated or interaction-heavy subtrees.
 3. Render temporary screenshots for all relevant screens and overlays.
 4. Compare the result with the reference manifest or approved requirements.
 5. Inspect interaction arrays, components, variables, destinations, and flow start points. `overflow` is not reported by inspection, so judge scrolling by comparing track and viewport sizes or by reading the saved document.
-6. Trace the reported interaction graph by hand. Playback is not observable from this tool set: in a headless session `proto.preview` and `proto.present` succeed without a window, and `pointer` drives the canvas, not the player. List the click-through checks the user must run instead of calling them verified.
-7. Save only after approved remediation. Inspect once more after saving.
+6. Check assets and type: confirm screen sizes against `frame.presets`, run `text.missingFonts`, and inspect icon and illustration frames for real vector children rather than empty or placeholder layers.
+7. Trace the reported interaction graph by hand. Playback is not observable from this tool set: in a headless session `proto.preview` and `proto.present` succeed without a window, and `pointer` drives the canvas, not the player. List the click-through checks the user must run instead of calling them verified.
+8. Save only after approved remediation. Inspect once more after saving.
 
 Do not apply fixes without user approval when they change visual direction, information architecture, navigation, content, or product behavior. Safe mechanical fixes may be offered separately.
 
-## 5. Report Format
+## 6. Report Format
 
 ```markdown
 # FigCraft Review
@@ -83,6 +102,7 @@ Do not apply fixes without user approval when they change visual direction, info
 **File:** `ui.figcraft`
 **Design score:** 88 / 100
 **Reference coverage:** PASS
+**Assets, type & size:** FAIL
 **Prototype correctness:** FAIL
 
 | Dimension | Score | Main issue |
@@ -94,6 +114,7 @@ Do not apply fixes without user approval when they change visual direction, info
 ## Blocking findings
 1. `Button/Confirm` → destination id is missing. Reconnect it to `Screen/Success`.
 2. `Overlay/Delete` has no explicit close action while outside dismissal is disabled.
+3. `Icon/Filter` is an empty frame; the Iconify fetch returned nothing. Re-source it from the same set.
 
 ## Other findings
 - `Frame 45` should be renamed `Section/Recommendations`.

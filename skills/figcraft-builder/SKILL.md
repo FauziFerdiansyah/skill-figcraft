@@ -12,7 +12,7 @@ Load the `figcraft` coordinator for intake, scope, and completion rules.
 ## Core Rules
 
 1. **Match the source.** Reconstruct hierarchy, layout, copy, typography, color, radius, effects, imagery, and visible states with care. Do not replace a distinctive reference with a generic template.
-2. **Build natively.** Use frames, auto layout, components, instances, vectors, styles, and variables where they improve editability and consistency.
+2. **Build natively.** Use frames, auto layout, components, instances, vectors, styles, and variables where they improve editability and consistency. Delegate artwork to `figcraft-svg`, icons to `figcraft-icons`, and type to `figcraft-typography`.
 3. **Keep scope exact.** Build only the screens, states, overlays, and responsive sizes represented by the supplied references or explicitly approved requirements.
 4. **Ask on consequential ambiguity.** Do not guess page mapping, navigation outcomes, hidden states, product copy, data meaning, or unsupported behavior.
 5. **Verify, then save.** Inspect the layer tree and render temporary screenshots for visual checking. Do not export preview PNG files as deliverables unless requested.
@@ -53,7 +53,7 @@ For each reference or approved screen, record:
 - likely interactive elements and all visible states;
 - assets that must be imported, recreated, or requested.
 
-Use the actual reference dimensions when known. Common device sizes are fallbacks, not mandatory defaults. Never force a 390×844 frame, 44 px radius, or Inter font when the source indicates something else.
+Use the real device preset for the target. `frame.presets` lists what the engine offers and `frame.create {preset}` creates the frame at that exact size; the coordinator skill carries the catalog and the rules for choosing one. Use the reference's own dimensions when the user supplies them instead. Never force a remembered size, radius, or font when the source says otherwise.
 
 ## 3. Structure and Layout
 
@@ -131,19 +131,27 @@ Coordinates are relative to the immediate parent frame. Auto-layout children are
 
 ### Icons and supplied assets
 
-Draw icons as native vectors instead of placeholder rectangles:
+Build UI structure here and delegate the assets:
+
+- Interface icons go to `figcraft-icons`, which sources them from a real icon set instead of hand-drawing glyphs.
+- Illustrations, mascots, logos, and organic artwork go to `figcraft-svg`, which authors curves as SVG and imports them as editable vectors.
+- Typeface choice and installing a family go to `figcraft-typography`.
+
+When the user supplied an SVG or image, import the original with `file.import` rather than redrawing it. An SVG becomes an editable frame of shapes and an image becomes an image layer.
+
+A simple one-off glyph can still be a native vector:
 
 ```json
 {
   "type": "vector",
-  "name": "Icon/Search",
+  "name": "Icon/Chevron",
   "parent": 12,
-  "path": "M11 2a7 7 0 1 0 4.2 12.6l4.1 4.1 1.4-1.4-4.1-4.1A7 7 0 0 0 11 2Z",
+  "path": "M9 5l7 7-7 7",
   "props": {"fill": "#1C1C1E"}
 }
 ```
 
-When the user supplies SVG or image files, bring them in with `file.import`: an SVG becomes an editable frame of shapes and an image becomes an image layer. Do not hand-trace a logo that was supplied as a file, and do not substitute an invented asset for one that was never provided. Ask for it.
+Do not stack primitives to imitate detailed artwork, and do not invent an asset that was never provided. Ask for it.
 
 ## 5. Verification and Handoff
 
